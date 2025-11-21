@@ -1,0 +1,188 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Submit Claim";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Submit New Claim</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Submit" method="post" enctype="multipart/form-data" id="claimForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Auto-calculation Display -->
+                    <div class="alert alert-info mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Total Hours:</strong> <span id="totalHours">0</span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Total Amount:</strong> R <span id="totalAmount">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Lecturer ID *</label>
+                                <input type="number" name="lecturerID" class="form-control" required
+                                       placeholder="Enter your lecturer ID" min="1" id="lecturerID">
+                                <small class="form-text text-muted">Your assigned lecturer identification number</small>
+                                <div class="invalid-feedback" id="lecturerError"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Number of Sessions *</label>
+                                <input type="number" name="number_of_sessions" class="form-control" required
+                                       placeholder="Number of teaching sessions" min="1" max="50" id="sessions">
+                                <div class="invalid-feedback">Please enter a valid number of sessions (1-50)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Number of Hours *</label>
+                                <input type="number" name="number_of_hours" class="form-control" required
+                                       placeholder="Total hours worked" min="1" max="200" id="hours" step="0.5">
+                                <div class="invalid-feedback">Please enter valid hours (1-200)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Hourly Rate (R) *</label>
+                                <input type="number" name="amount_of_rate" class="form-control" required
+                                       placeholder="Rate per hour" min="50" max="1000" id="rate" step="0.01">
+                                <div class="invalid-feedback">Please enter a valid rate (R50 - R1000)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Module Name *</label>
+                                <input type="text" name="module_name" class="form-control" required
+                                       placeholder="Name of the module" id="module">
+                                <div class="invalid-feedback">Module name is required</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Faculty Name *</label>
+                                <select name="faculty_name" class="form-control" required id="faculty">
+                                    <option value="">Select Faculty</option>
+                                    <option value="Science">Faculty of Science</option>
+                                    <option value="Engineering">Faculty of Engineering</option>
+                                    <option value="Business">Faculty of Business</option>
+                                    <option value="Arts">Faculty of Arts</option>
+                                    <option value="Health Sciences">Faculty of Health Sciences</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a faculty</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Supporting Document</label>
+                        <input type="file" name="supportingDocument" class="form-control" id="document"
+                               accept=".pdf,.docx,.xlsx,.jpg,.png">
+                        <small class="form-text text-muted">Optional: PDF, Word, Excel, or image files (max 5MB)</small>
+                        <div class="invalid-feedback" id="documentError"></div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="bi bi-send"></i> Submit Claim
+                        </button>
+                        <a href="/Claims/AllClaims" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Auto-calculation function
+            function calculateTotal() {
+                const hours = parseFloat($('#hours').val()) || 0;
+                const rate = parseFloat($('#rate').val()) || 0;
+                const totalAmount = hours * rate;
+
+                $('#totalHours').text(hours);
+                $('#totalAmount').text(totalAmount.toFixed(2));
+            }
+
+            // Real-time calculation
+            $('#hours, #rate').on('input', calculateTotal);
+
+            // Lecturer ID validation
+            $('#lecturerID').on('blur', function() {
+                const lecturerId = $(this).val();
+                if (lecturerId) {
+                    $.get('/Claims/ValidateLecturer?id=' + lecturerId, function(response) {
+                        if (!response.valid) {
+                            $('#lecturerError').text('Invalid Lecturer ID');
+                            $('#lecturerID').addClass('is-invalid');
+                        } else {
+                            $('#lecturerError').text('');
+                            $('#lecturerID').removeClass('is-invalid');
+                        }
+                    });
+                }
+            });
+
+            // File validation
+            $('#document').on('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const maxSize = 5 * 1024 * 1024; // 5MB
+                    const validTypes = ['application/pdf',
+                                       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                       'image/jpeg', 'image/png'];
+
+                    if (file.size > maxSize) {
+                        $('#documentError').text('File size must be less than 5MB');
+                        $(this).addClass('is-invalid');
+                    } else if (!validTypes.includes(file.type)) {
+                        $('#documentError').text('Please select a valid file type (PDF, Word, Excel, JPEG, PNG)');
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $('#documentError').text('');
+                        $(this).removeClass('is-invalid');
+                    }
+                }
+            });
+
+            // Form validation
+            $('#claimForm').on('submit', function(e) {
+                let isValid = true;
+
+                // Validate all required fields
+                $(this).find('[required]').each(function() {
+                    if (!$(this).val()) {
+                        $(this).addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields correctly.');
+                }
+            });
+        });
+    </script>
+}

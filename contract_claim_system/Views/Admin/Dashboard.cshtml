@@ -1,0 +1,99 @@
+﻿@model contract_claim_system.Controllers.AdminDashboardStats
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Claims</h5>
+                <h2>@Model.TotalClaims</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Pending Claims</h5>
+                <h2>@Model.PendingClaims</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Approved Claims</h5>
+                <h2>@Model.ApprovedClaims</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <h2>@Model.TotalUsers</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Claims</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentClaims.Any())
+                {
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Module</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in Model.RecentClaims)
+                            {
+                                <tr>
+                                    <td>@claim.claimID</td>
+                                    <td>@claim.module_name</td>
+                                    <td><span class="badge bg-@(claim.claim_status == "Approved" ? "success" : claim.claim_status == "Rejected" ? "danger" : "warning")">@claim.claim_status</span></td>
+                                    <td>@claim.creating_date.ToString("MMM dd")</td>
+                                    <td>R @(claim.number_of_hours* claim.amount_of_rate)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No recent claims.</p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/Admin/ManageClaims" class="btn btn-primary">Manage Claims</a>
+                    <a href="/Admin/Users" class="btn btn-secondary">Manage Users</a>
+                    <a href="/Admin/Financials" class="btn btn-info">Financial Overview</a>
+                    <a href="/Claims/AllClaims" class="btn btn-outline-primary">View All Claims</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

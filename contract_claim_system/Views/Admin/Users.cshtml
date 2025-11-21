@@ -1,0 +1,44 @@
+﻿@model IEnumerable<contract_claim_system.Models.User>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Manage Users";
+}
+
+<h2>Manage Users</h2>
+
+<div class="mb-3">
+    <a href="/Admin/AddUser" class="btn btn-success">Add New User</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Gender</th>
+            <th>Join Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.userID</td>
+                <td>@user.full_names @user.surname</td>
+                <td>@user.email</td>
+                <td><span class="badge bg-secondary">@user.role</span></td>
+                <td>@user.gender</td>
+                <td>@user.date.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <form method="post" asp-action="DeleteUser" onsubmit="return confirm('Delete this user?');" style="display:inline;">
+                        <input type="hidden" name="id" value="@user.userID" />
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

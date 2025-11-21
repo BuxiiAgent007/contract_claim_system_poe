@@ -1,0 +1,63 @@
+﻿@model contract_claim_system.Models.Claim
+@{
+    Layout = "_Layout";
+}
+<h2>Claim #@Model.claimID</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Lecturer ID:</strong> @Model.lecturerID</p>
+                <p><strong>Number of Sessions:</strong> @Model.number_of_sessions</p>
+                <p><strong>Number of Hours:</strong> @Model.number_of_hours</p>
+                <p><strong>Hourly Rate:</strong> R @Model.amount_of_rate</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Total Amount:</strong> R @(Model.number_of_hours* Model.amount_of_rate)</p>
+                <p><strong>Module Name:</strong> @Model.module_name</p>
+                <p><strong>Faculty Name:</strong> @Model.faculty_name</p>
+                <p>
+                    <strong>Status:</strong>
+                    <span class="badge bg-@(Model.claim_status == "Approved" ? "success" : Model.claim_status == "Rejected" ? "danger" : "warning")">
+                        @Model.claim_status
+                    </span>
+                </p>
+                <p><strong>Submitted:</strong> @Model.creating_date.ToLocalTime().ToString("g")</p>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.supporting_documents))
+        {
+            <div class="mt-3">
+                <p><strong>Supporting Documents:</strong></p>
+                <a href="@Model.supporting_documents" target="_blank" class="btn btn-outline-primary">
+                    📎 View Uploaded Document
+                </a>
+            </div>
+        }
+
+        <div class="mt-4">
+            <a href="/Claims/AllClaims" class="btn btn-secondary">← Back to All Claims</a>
+
+            @if (Model.claim_status == "Pending")
+            {
+                <form method="post" asp-action="UpdateStatus" style="display:inline;">
+                    <input type="hidden" name="id" value="@Model.claimID" />
+                    <input type="hidden" name="status" value="Approved" />
+                    <button class="btn btn-success" type="submit">Approve Claim</button>
+                </form>
+                <form method="post" asp-action="UpdateStatus" style="display:inline;">
+                    <input type="hidden" name="id" value="@Model.claimID" />
+                    <input type="hidden" name="status" value="Rejected" />
+                    <button class="btn btn-danger" type="submit">Reject Claim</button>
+                </form>
+            }
+        </div>
+    </div>
+</div>

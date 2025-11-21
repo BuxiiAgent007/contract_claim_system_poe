@@ -1,0 +1,52 @@
+﻿@model List<dynamic>
+@{
+    Layout = "_Layout";
+}
+<h2>Available Users in Database</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-danger">
+        <h4>No Users Found!</h4>
+        <p>There are no users in the database. You need to create at least one user.</p>
+        <a href="/Test/FixDatabase" class="btn btn-primary">Create Test User</a>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <strong>Use these User IDs when submitting claims:</strong>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td><strong>@user.UserID</strong></td>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>
+                        <a href="/Claims/Submit" class="btn btn-sm btn-primary"
+                           onclick="localStorage.setItem('lastLecturerID', '@user.UserID')">
+                            Use This ID
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mt-3">
+    <a href="/Claims/Submit" class="btn btn-success">Go to Submit Claim</a>
+    <a href="/Test/FixDatabase" class="btn btn-warning">Create More Test Users</a>
+</div>

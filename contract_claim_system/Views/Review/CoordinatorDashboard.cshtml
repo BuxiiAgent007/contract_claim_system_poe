@@ -1,0 +1,106 @@
+﻿@model IEnumerable<contract_claim_system.Models.Claim>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Coordinator Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clipboard-check text-primary"></i> Coordinator Dashboard</h2>
+    <div class="badge bg-info fs-6">@Model.Count() Claims for Review</div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success text-center py-5">
+        <i class="bi bi-check-circle" style="font-size: 3rem;"></i>
+        <h4 class="mt-3">No Claims Pending Review!</h4>
+        <p class="mb-0">All claims have been processed. Great work! 🎉</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-list-check"></i>
+                Claims Awaiting Coordinator Approval
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Lecturer</th>
+                            <th>Module</th>
+                            <th>Faculty</th>
+                            <th>Hours</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claim in Model)
+                        {
+                            <tr>
+                                <td><strong>#@claim.claimID</strong></td>
+                                <td>@claim.lecturerID</td>
+                                <td>@claim.module_name</td>
+                                <td>@claim.faculty_name</td>
+                                <td>@claim.number_of_hours</td>
+                                <td>R @claim.amount_of_rate</td>
+                                <td><strong>R @(claim.number_of_hours* claim.amount_of_rate)</strong></td>
+                                <td>
+                                    <span class="badge bg-@(claim.claim_status == "Pending" ? "warning" : "success")">
+                                        @claim.claim_status
+                                    </span>
+                                </td>
+                                <td>@claim.creating_date.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/Review/ReviewClaim/@claim.claimID"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Review Claim">
+                                            <i class="bi bi-search"></i> Review
+                                        </a>
+                                        <form method="post" asp-action="ApproveAsCoordinator" style="display:inline;">
+                                            <input type="hidden" name="claimId" value="@claim.claimID" />
+                                            <button class="btn btn-sm btn-success" type="submit"
+                                                    title="Approve Claim">
+                                                <i class="bi bi-check-lg"></i> Approve
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3 text-muted">
+        <small>Showing @Model.Count() claims for coordinator review</small>
+    </div>
+}

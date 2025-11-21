@@ -1,0 +1,146 @@
+﻿@model contract_claim_system.Models.User
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Add New User";
+}
+
+<h2>Add New User</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<form asp-action="AddUser" method="post" id="userForm">
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">First Names *</label>
+                <input type="text" class="form-control" asp-for="full_names" required />
+                <span asp-validation-for="full_names" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Surname *</label>
+                <input type="text" class="form-control" asp-for="surname" required />
+                <span asp-validation-for="surname" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email *</label>
+        <input type="email" class="form-control" asp-for="email" required />
+        <span asp-validation-for="email" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Role *</label>
+                <select class="form-control" asp-for="role" required>
+                    <option value="">Select Role</option>
+                    <option value="Lecturer">Lecturer</option>
+                    <option value="Coordinator">Coordinator</option>
+                    <option value="Manager">Manager</option>
+                    <option value="HR">HR</option>
+                    <option value="Admin">Admin</option>
+                </select>
+                <span asp-validation-for="role" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Gender</label>
+                <select class="form-control" asp-for="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Password *</label>
+                <input type="password" name="password" id="password" class="form-control"
+                       required minlength="6"
+                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$"
+                       title="Password must be at least 6 characters with uppercase, lowercase and number" />
+                <div class="form-text">
+                    Must be at least 6 characters with uppercase, lowercase and number
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Confirm Password *</label>
+                <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" required />
+                <div id="passwordMatch" class="form-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary" id="submitBtn">Add User</button>
+        <a href="/Admin/Users" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const passwordMatch = document.getElementById('passwordMatch');
+            const submitBtn = document.getElementById('submitBtn');
+            const form = document.getElementById('userForm');
+
+            function validatePasswords() {
+                if (password.value && confirmPassword.value) {
+                    if (password.value === confirmPassword.value) {
+                        passwordMatch.innerHTML = '<span class="text-success">✓ Passwords match</span>';
+                        submitBtn.disabled = false;
+                    } else {
+                        passwordMatch.innerHTML = '<span class="text-danger">✗ Passwords do not match</span>';
+                        submitBtn.disabled = true;
+                    }
+                } else {
+                    passwordMatch.innerHTML = '';
+                    submitBtn.disabled = !password.value || !confirmPassword.value;
+                }
+            }
+
+            password.addEventListener('input', validatePasswords);
+            confirmPassword.addEventListener('input', validatePasswords);
+
+            form.addEventListener('submit', function(e) {
+                if (password.value !== confirmPassword.value) {
+                    e.preventDefault();
+                    alert('Passwords do not match. Please check and try again.');
+                    return false;
+                }
+
+                if (password.value.length < 6) {
+                    e.preventDefault();
+                    alert('Password must be at least 6 characters long.');
+                    return false;
+                }
+
+                return confirm('Are you sure you want to add this user?');
+            });
+
+            // Initial validation
+            validatePasswords();
+        });
+    </script>
+}

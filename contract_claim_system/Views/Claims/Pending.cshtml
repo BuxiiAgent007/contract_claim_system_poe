@@ -1,0 +1,123 @@
+﻿@model IEnumerable<contract_claim_system.Models.Claim>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Pending Claims";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clock text-warning"></i> Pending Claims</h2>
+    <div>
+        <a href="/Claims/AllClaims" class="btn btn-outline-secondary">
+            <i class="bi bi-list-check"></i> All Claims
+        </a>
+        <a href="/Admin/Dashboard" class="btn btn-outline-primary">
+            <i class="bi bi-speedometer2"></i> Admin Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Alert Messages -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success text-center py-5">
+        <i class="bi bi-check-circle" style="font-size: 3rem;"></i>
+        <h4 class="mt-3">No Pending Claims!</h4>
+        <p class="mb-0">All claims have been processed. Great work! 🎉</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <i class="bi bi-exclamation-triangle"></i>
+                @Model.Count() Claim@(Model.Count() > 1 ? "s" : "") Awaiting Review
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Lecturer ID</th>
+                            <th>Module</th>
+                            <th>Faculty</th>
+                            <th>Hours</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                            <th>Submitted</th>
+                            <th>Documents</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claim in Model)
+                        {
+                            <tr>
+                                <td><strong>#@claim.claimID</strong></td>
+                                <td>@claim.lecturerID</td>
+                                <td>@claim.module_name</td>
+                                <td>@claim.faculty_name</td>
+                                <td>@claim.number_of_hours</td>
+                                <td>R @claim.amount_of_rate</td>
+                                <td><strong>R @(claim.number_of_hours* claim.amount_of_rate)</strong></td>
+                                <td>@claim.creating_date.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(claim.supporting_documents))
+                                    {
+                                        <a href="@claim.supporting_documents" target="_blank" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-file-earmark"></i> View
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/Claims/Details/@claim.claimID" class="btn btn-sm btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" asp-action="Approve" style="display:inline;">
+                                            <input type="hidden" name="id" value="@claim.claimID" />
+                                            <button class="btn btn-sm btn-success" type="submit" title="Approve Claim">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" asp-action="Reject" style="display:inline;">
+                                            <input type="hidden" name="id" value="@claim.claimID" />
+                                            <button class="btn btn-sm btn-danger" type="submit" title="Reject Claim">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3 text-muted">
+        <small>Showing @Model.Count() pending claims</small>
+    </div>
+}

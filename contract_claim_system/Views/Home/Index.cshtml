@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "_Layout";
+}
+
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Welcome Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 text-primary mb-3">Welcome to Contract Claim System</h1>
+            <p class="lead text-muted">Streamline your contract claim submissions and approvals</p>
+        </div>
+
+        <!-- Alert Messages (Fixed) -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i> @TempData["Message"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Quick Action Cards -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <div class="text-primary mb-3">
+                            <i class="bi bi-plus-circle" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Submit New Claim</h5>
+                        <p class="card-text text-muted">Submit a new contract claim for teaching sessions, hours worked, and supporting documents.</p>
+                        <a href="/Claims/Submit" class="btn btn-primary mt-3">Get Started</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <div class="text-success mb-3">
+                            <i class="bi bi-list-check" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">View All Claims</h5>
+                        <p class="card-text text-muted">Browse all submitted claims, check status, and manage existing submissions.</p>
+                        <a href="/Claims/AllClaims" class="btn btn-success mt-3">View Claims</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <div class="text-warning mb-3">
+                            <i class="bi bi-clock-history" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Admin Dashboard</h5>
+                        <p class="card-text text-muted">Approve or reject pending claims, manage users, and view financial reports.</p>
+                        <a href="/Admin/Dashboard" class="btn btn-warning mt-3">Admin Portal</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-lightning-charge text-primary me-2"></i>Quick Features</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Easy claim submission</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Document upload support</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Real-time status tracking</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Admin approval workflow</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Financial reporting</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>User management</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats (Optional) -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="text-center">
+                    <p class="text-muted">
+                        Need help? Contact your system administrator or refer to the user guide.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

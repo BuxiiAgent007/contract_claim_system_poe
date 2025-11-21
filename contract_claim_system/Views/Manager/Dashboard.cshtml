@@ -1,0 +1,49 @@
+﻿@model IEnumerable<contract_claim_system.Models.Claim>
+@{
+    ViewData["Title"] = "HR Dashboard - Payment Processing";
+}
+
+<h2><i class="bi bi-currency-dollar"></i> HR Payment Processing</h2>
+
+<!-- Approved Claims Ready for Payment -->
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Approved Claims Ready for Payment</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Lecturer</th>
+                    <th>Amount</th>
+                    <th>Approved Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.Where(c => c.claim_status == "Approved"))
+                {
+                    <tr>
+                        <td>#@claim.claimID</td>
+                        <td>@claim.lecturerID</td>
+                        <td class="fw-bold">R @claim.TotalAmount.ToString("N2")</td>
+                        <td>@claim.approved_date?.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <a href="/HR/GenerateInvoice/@claim.claimID" class="btn btn-sm btn-primary">
+                                <i class="bi bi-receipt"></i> Generate Invoice
+                            </a>
+                            <form method="post" asp-action="ProcessPayment" asp-route-id="@claim.claimID" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-success">Process Payment</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="mt-3">
+            <strong>Total Payable: R @Model.Where(c => c.claim_status == "Approved").Sum(c => c.TotalAmount).ToString("N2")</strong>
+        </div>
+    </div>
+</div>

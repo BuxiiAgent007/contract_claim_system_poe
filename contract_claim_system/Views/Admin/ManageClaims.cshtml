@@ -1,0 +1,71 @@
+﻿@model IEnumerable<contract_claim_system.Models.Claim>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Manage Claims";
+}
+
+<h2>Manage Claims</h2>
+
+<form method="post" asp-action="BulkUpdateStatus" id="bulkForm">
+    <div class="mb-3">
+        <select name="status" class="form-select d-inline-block w-auto">
+            <option value="Approved">Approve Selected</option>
+            <option value="Rejected">Reject Selected</option>
+            <option value="Pending">Set to Pending</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Apply to Selected</button>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th>ID</th>
+                <th>Lecturer ID</th>
+                <th>Module</th>
+                <th>Faculty</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" name="claimIds" value="@claim.claimID" /></td>
+                    <td>@claim.claimID</td>
+                    <td>@claim.lecturerID</td>
+                    <td>@claim.module_name</td>
+                    <td>@claim.faculty_name</td>
+                    <td>@claim.number_of_hours</td>
+                    <td>R @claim.amount_of_rate</td>
+                    <td>R @(claim.number_of_hours* claim.amount_of_rate)</td>
+                    <td>
+                        <span class="badge bg-@(claim.claim_status == "Approved" ? "success" : claim.claim_status == "Rejected" ? "danger" : "warning")">
+                            @claim.claim_status
+                        </span>
+                    </td>
+                    <td>@claim.creating_date.ToString("MMM dd, yyyy")</td>
+                    <td>
+                        <a href="/Claims/Details/@claim.claimID" class="btn btn-sm btn-info">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById('selectAll').addEventListener('change', function() {
+            var checkboxes = document.getElementsByName('claimIds');
+            for (var checkbox of checkboxes) {
+                checkbox.checked = this.checked;
+            }
+        });
+    </script>
+}

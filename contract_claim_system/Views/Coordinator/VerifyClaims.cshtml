@@ -1,0 +1,189 @@
+﻿@model IEnumerable<contract_claim_system.Models.Claim>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Claims Verification - Programme Coordinator";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-clipboard-check text-primary"></i> Claims Verification</h2>
+        <div>
+            <a href="/Coordinator/Dashboard" class="btn btn-outline-primary">
+                <i class="bi bi-speedometer2"></i> Coordinator Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Pending Verification</h5>
+                    <h3>@Model.Count(c => c.claim_status == "Pending")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Verified Today</h5>
+                    <h3>@Model.Count(c => c.claim_status == "Verified" && c.verified_date?.Date == DateTime.Today)</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total This Month</h5>
+                    <h3>@Model.Count(c => c.creating_date.Month == DateTime.Now.Month)</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Awaiting Manager</h5>
+                    <h3>@Model.Count(c => c.claim_status == "Verified")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any(c => c.claim_status == "Pending"))
+    {
+        <div class="alert alert-success text-center py-5">
+            <i class="bi bi-check-circle" style="font-size: 3rem;"></i>
+            <h4 class="mt-3">All Claims Verified!</h4>
+            <p class="mb-0">No pending claims require verification at this time.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var claim in Model.Where(c => c.claim_status == "Pending").OrderBy(c => c.creating_date))
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-earmark-text"></i>
+                                Claim #@claim.claimID
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">@claim.module_name</h6>
+                            <p class="card-text">
+                                <strong>Faculty:</strong> @claim.faculty_name<br>
+                                <strong>Lecturer ID:</strong> @claim.lecturerID<br>
+                                <strong>Sessions:</strong> @claim.number_of_sessions<br>
+                                <strong>Submitted:</strong> @claim.creating_date.ToString("MMM dd, yyyy")
+                            </p>
+
+                            <!-- Payment Details -->
+                            <div class="border rounded p-3 bg-light mb-3">
+                                <h6 class="border-bottom pb-2">Payment Details</h6>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <small class="text-muted">Hours</small>
+                                        <h5>@claim.number_of_hours</h5>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Rate</small>
+                                        <h5>R @claim.amount_of_rate</h5>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">Total Amount</small>
+                                    <h4 class="text-success">R @((claim.number_of_hours * claim.amount_of_rate).ToString("N2"))</h4>
+                                </div>
+                            </div>
+
+                            <!-- Verification Criteria -->
+                            <div class="border rounded p-3 mb-3">
+                                <h6 class="border-bottom pb-2">Verification Check</h6>
+                                <div class="small">
+                                    @if (claim.number_of_hours <= 40)
+                                    {
+                                        <p class="text-success mb-1">✅ Hours within normal limit (≤ 40)</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-warning mb-1">⚠️ Hours exceed normal limit (> 40)</p>
+                                    }
+
+                                    @if (claim.amount_of_rate <= 300)
+                                    {
+                                        <p class="text-success mb-1">✅ Rate within normal range (≤ R300)</p>
+                                    }
+                                    else if (claim.amount_of_rate <= 500)
+                                    {
+                                        <p class="text-warning mb-1">⚠️ Rate above normal range (R300-500)</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-danger mb-1">❌ Rate requires special approval (> R500)</p>
+                                    }
+
+                                    @if (claim.number_of_hours * claim.amount_of_rate <= 10000)
+                                    {
+                                        <p class="text-success mb-1">✅ Total amount within limit (≤ R10,000)</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-warning mb-1">⚠️ Total amount requires manager attention (> R10,000)</p>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="btn-group w-100" role="group">
+                                <form method="post" asp-action="VerifyClaim" asp-controller="Coordinator"
+                                      asp-route-id="@claim.claimID" class="w-50">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-success w-100"
+                                            onclick="return confirm('Verify claim #@claim.claimID for R@((claim.number_of_hours * claim.amount_of_rate).ToString("N2"))?')">
+                                        <i class="bi bi-check-circle"></i> Verify
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-warning w-50"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#queryModal@(claim.claimID)">
+                                    <i class="bi bi-question-circle"></i> Query
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Query Modal -->
+                    <div class="modal fade" id="queryModal@(claim.claimID)" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Query Claim #@claim.claimID</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="post" asp-action="QueryClaim" asp-controller="Coordinator"
+                                      asp-route-id="@claim.claimID">
+                                    @Html.AntiForgeryToken()
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Query Reason</label>
+                                            <textarea name="queryReason" class="form-control" rows="3"
+                                              placeholder="Please specify the reason for querying this claim..."
+                                              required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning">Submit Query</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

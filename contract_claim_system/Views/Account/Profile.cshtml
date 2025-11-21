@@ -1,0 +1,82 @@
+﻿@model contract_claim_system.Models.User
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-person-circle"></i> My Profile</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                             style="width: 80px; height: 80px; font-size: 2rem;">
+                            @Model.full_names[0]@Model.surname[0]
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h5>@Model.full_names @Model.surname</h5>
+                        <p class="text-muted mb-1"><i class="bi bi-envelope"></i> @Model.email</p>
+                        <p class="text-muted mb-1"><i class="bi bi-person-badge"></i> @Model.role</p>
+                        <p class="text-muted mb-1"><i class="bi bi-gender-ambiguous"></i> @Model.gender</p>
+                        <p class="text-muted mb-0"><i class="bi bi-calendar"></i> Member since @Model.date.ToString("MMM yyyy")</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6>Quick Actions</h6>
+                        <div class="d-grid gap-2 d-md-flex">
+                            @if (Model.role == "Lecturer")
+                            {
+                                <a href="/Claims/Submit" class="btn btn-primary me-md-2">
+                                    <i class="bi bi-plus-circle"></i> Submit New Claim
+                                </a>
+                                <a href="/Claims/MyClaims?lecturerID=@Model.userID" class="btn btn-outline-primary">
+                                    <i class="bi bi-list-check"></i> View My Claims
+                                </a>
+                            }
+                            else if (Model.role == "Coordinator")
+                            {
+                                <a href="/Review/CoordinatorDashboard" class="btn btn-primary me-md-2">
+                                    <i class="bi bi-clipboard-check"></i> Coordinator Dashboard
+                                </a>
+                            }
+                            else if (Model.role == "Manager")
+                            {
+                                <a href="/Review/ManagerDashboard" class="btn btn-primary me-md-2">
+                                    <i class="bi bi-clipboard-data"></i> Manager Dashboard
+                                </a>
+                            }
+                            else if (Model.role == "HR")
+                            {
+                                <a href="/HR/Dashboard" class="btn btn-primary me-md-2">
+                                    <i class="bi bi-person-badge"></i> HR Dashboard
+                                </a>
+                            }
+                            else if (Model.role == "Admin")
+                            {
+                                <a href="/Admin/Dashboard" class="btn btn-primary me-md-2">
+                                    <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                </a>
+                            }
+
+                            <form method="post" asp-action="Logout" asp-controller="Account" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

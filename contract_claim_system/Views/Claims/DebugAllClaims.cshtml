@@ -1,0 +1,57 @@
+﻿@{
+    Layout = "_Layout";
+}
+<h2>Debug - All Claims in Database</h2>
+
+<h3>Database Summary:</h3>
+<p>Total Claims: <strong>@ViewBag.TotalCount</strong></p>
+<p>Claims for Lecturer 1: <strong>@ViewBag.Lecturer1Count</strong></p>
+
+@if (ViewBag.AllClaims != null && ViewBag.AllClaims.Count > 0)
+{
+    <h4>All Claims:</h4>
+    <table class="table table-sm">
+        <tr><th>ID</th><th>LecturerID</th><th>Module</th><th>Status</th><th>Hours</th><th>Date</th></tr>
+        @foreach (var claim in ViewBag.AllClaims)
+        {
+            <tr>
+                <td>@claim.claimID</td>
+                <td>@claim.lecturerID</td>
+                <td>@claim.module_name</td>
+                <td>@claim.claim_status</td>
+                <td>@claim.number_of_hours</td>
+                <td>@claim.creating_date</td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No claims found in database at all!</div>
+}
+
+@if (ViewBag.Lecturer1Claims != null && ViewBag.Lecturer1Claims.Count > 0)
+{
+    <h4>Claims for Lecturer 1:</h4>
+    <table class="table table-sm table-success">
+        <tr><th>ID</th><th>LecturerID</th><th>Module</th><th>Status</th><th>Hours</th><th>Date</th></tr>
+        @foreach (var claim in ViewBag.Lecturer1Claims)
+        {
+            <tr>
+                <td>@claim.claimID</td>
+                <td>@claim.lecturerID</td>
+                <td>@claim.module_name</td>
+                <td>@claim.claim_status</td>
+                <td>@claim.number_of_hours</td>
+                <td>@claim.creating_date</td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No claims found for Lecturer 1</div>
+}
+
+<a href="/Claims/Submit" class="btn btn-primary">Submit a Test Claim</a>
+<a href="/Claims/MyClaims?lecturerID=1" class="btn btn-secondary">Back to My Claims</a>
