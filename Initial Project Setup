@@ -1,0 +1,4 @@
+- Set up basic project structure with Controllers, Models, Views
+- Configured Program.cs with service registrations
+- Added basic layout and styling with Bootstrap 5
+- Set up SQL Server database connection
